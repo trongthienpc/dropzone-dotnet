@@ -1,0 +1,107 @@
+@{
+ViewData["Title"] = "Dropzone";
+}
+<script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI="
+    crossorigin="anonymous"></script>
+<script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
+<link href="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone.css" rel="stylesheet" type="text/css" />
+
+<div class="text-center">
+    <h1 class="display-4">Dropzone</h1>
+    <form class="dropzone" id="image_upload_dropzone" enctype="multipart/form-data">
+    </form>
+
+    <!-- <div id="previews" class="dz-default dz-message box__input dropzone mt-2">
+        <div style="text-align:center">
+        </div>
+    </div> -->
+    <div id="previewFiles" class="mt-2"></div>
+    <div class="mt-2">
+        <input type="submit" id="Submit" name="Submit" class="btn btn-success m-t-5" value="Submit" />
+    </div>
+
+    <img src="~/uploads/img/27d413570e5a7411845df4dd7241b0cbe96eb5ea.png" width="120" alt="">
+</div>
+<script>
+    function myParaName() {
+        return "files";
+    }
+    let myDropzone = new Dropzone("#image_upload_dropzone", {
+        //parameter name value
+        url: "Dropzone/SaveUploadedFile",
+        method: "Post",
+        paramName: myParaName,
+        //clickable div id
+        // clickable: '#previews',
+        //preview files container Id
+        previewsContainer: "#previewFiles",
+        autoProcessQueue: false,
+        uploadMultiple: true,
+        parallelUploads: 100,
+        maxFiles: 100,
+        //  url:"/", // url here to save file
+        maxFilesize: 100,//max file size in MB,
+        addRemoveLinks: true,
+        dictResponseError: 'Server not Configured',
+        acceptedFiles: ".png,.jpg,.gif,.bmp,.jpeg,.pdf",// use this to restrict file type
+        init: function () {
+            var self = this;
+            // config
+            self.options.addRemoveLinks = true;
+            self.options.dictRemoveFile = "Delete";
+            //New file added
+            self.on("addedfile", function (file) {
+                console.log('new file added ', file);
+                $('.dz-success-mark').hide();
+                $('.dz-error-mark').hide();
+            });
+            // Send file starts
+            self.on("sending", function (file) {
+                console.log('upload started', file);
+                $('.meter').show();
+            });
+
+            // File upload Progress
+            self.on("totaluploadprogress", function (progress) {
+                console.log("progress ", progress);
+                $('.roller').width(progress + '%');
+            });
+
+            self.on("queuecomplete", function (progress) {
+                $('.meter').delay(999).slideUp(999);
+            });
+
+            // On removing file
+            self.on("removedfile", function (file) {
+                console.log(file);
+            });
+
+            $('#Submit').on("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Validate form here if needed
+
+                if (self.getQueuedFiles().length > 0) {
+                    self.processQueue();
+
+
+                } else {
+                    self.uploadFiles([]);
+                    $('#myDropzone').submit();
+                }
+
+            });
+
+
+
+            self.on("successmultiple", function (files, response) {
+                console.log("files")
+                // console.log(files);
+                console.log(response);
+                // Gets triggered when the files have successfully been sent.
+                // Redirect user or notify of success.
+
+            });
+        }
+    });
+</script>
